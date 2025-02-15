@@ -65,6 +65,12 @@
             }
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/nehalpatel1009/model-caching"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }
