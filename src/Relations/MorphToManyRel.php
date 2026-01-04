@@ -1,5 +1,6 @@
-<?php 
-namespace Nehal\ModelCaching\Traits\Relations;
+<?php
+
+namespace Nehal\ModelCaching\Relations;
 
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Nehal\ModelCaching\Traits\FiresPivotEventsTrait;

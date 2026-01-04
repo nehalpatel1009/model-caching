@@ -1,7 +1,8 @@
-<?php 
-namespace Nehal\ModelCaching\Traits\Relations;
+<?php
 
-use Nehal\ModelCaching\Traits\Traits\FiresPivotEventsTrait;
+namespace Nehal\ModelCaching\Relations;
+
+use Nehal\ModelCaching\Traits\FiresPivotEventsTrait;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class BelongsToManyRel extends BelongsToMany

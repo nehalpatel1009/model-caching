@@ -1,4 +1,5 @@
 <?php
+
 namespace Nehal\ModelCaching\Traits;
 
 trait PivotEventTrait

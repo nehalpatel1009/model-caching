@@ -1,59 +1,54 @@
-# Cache queries
+# Eloquent Power Cache
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/nehalpatel1009/model-caching.svg?style=flat-square)](https://packagist.org/packages/nehalpatel1009/model-caching)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/nehalpatel1009/model-caching/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/nehalpatel1009/model-caching/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/nehalpatel1009/model-caching/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/nehalpatel1009/model-caching/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/nehalpatel1009/model-caching.svg?style=flat-square)](https://packagist.org/packages/nehalpatel1009/model-caching)
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/model-caching.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/model-caching)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+A lightweight, opt-in model caching package for Laravel.
 
 ## Installation
-
-You can install the package via composer:
 
 ```bash
 composer require nehalpatel1009/model-caching
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="model-caching-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="model-caching-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="model-caching-views"
-```
-
 ## Usage
 
+Simply add the `CachesQueries` trait to any Eloquent model you want to cache.
+
 ```php
-$modelCaching = new Nehal\ModelCaching();
-echo $modelCaching->echoPhrase('Hello, Nehal!');
+use Nehal\ModelCaching\Traits\CachesQueries;
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    use CachesQueries;
+    
+    // Optional: Configure cache TTL (seconds)
+    protected $cacheTtl = 3600;
+    
+    // Optional: Configure cache prefix
+    protected $cachePrefix = 'products_cache';
+}
+```
+
+### How it works
+
+- Automatically caches `get()`, `first()`, `paginate()`, and `find()` queries.
+- Cache keys are generated based on the query SQL, bindings, and model class.
+- Automatically flushes the cache when the model is created, updated, deleted, or restored.
+- Uses Cache Tags (if supported by your driver) to scope invalidation to the specific model table.
+
+### Disabling Cache
+
+You can disable caching for a specific query:
+
+```php
+$products = Product::withoutCache()->get();
+```
+
+### Configuration
+
+You can override the cache store per model:
+
+```php
+protected $cacheStore = 'redis';
 ```
 
 ## Testing
@@ -61,24 +56,3 @@ echo $modelCaching->echoPhrase('Hello, Nehal!');
 ```bash
 composer test
 ```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
-
-- [Nehal Patel](https://github.com/nehalpatel1009)
-- [All Contributors](../../contributors)
-
-## License
-
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

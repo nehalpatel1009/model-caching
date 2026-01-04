@@ -4,7 +4,7 @@ namespace Nehal\ModelCaching\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Nehal\ModelCaching\ModelCachingServiceProvider;
+use Nehal\ModelCaching\Providers\ModelCachingServiceProvider;
 
 class TestCase extends Orchestra
 {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Nehal\ModelCaching\Traits;
 
 use Illuminate\Database\Eloquent\Model;
