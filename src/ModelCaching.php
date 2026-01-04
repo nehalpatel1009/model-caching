@@ -36,7 +36,7 @@ class ModelCaching
 
         $model = new $modelClass;
         $keyGenerator = Container::getInstance()->make(\Nehal\ModelCaching\Contracts\CacheKeyGeneratorInterface::class);
-        $tags = $keyGenerator->makeTags($model);
+        $tags = $keyGenerator->makeTags($model, []);
         
         $cache = Container::getInstance()->make('cache');
         $store = config('model-caching.store');

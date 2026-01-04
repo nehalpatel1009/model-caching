@@ -39,7 +39,10 @@ class CacheInvalidationObserver
 
     protected function invalidate(Model $model)
     {
-        $tags = $this->keyGenerator->makeTags($model);
+        // When invalidating, we only have the model itself, not eager loads
+        // The tags will include the model's table, which will invalidate
+        // all caches tagged with this model (including those with eager loads)
+        $tags = $this->keyGenerator->makeTags($model, []);
 
         // Check if cache store supports tags
         $store = $this->cache->getStore();

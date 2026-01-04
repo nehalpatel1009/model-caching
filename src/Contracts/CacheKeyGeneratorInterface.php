@@ -7,6 +7,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 interface CacheKeyGeneratorInterface
 {
-    public function make(Model $model, QueryBuilder $query, array $columns = ['*']): string;
-    public function makeTags(Model $model): array;
+    public function make(Model $model, QueryBuilder $query, array $columns = ['*'], array $eagerLoad = []): string;
+    public function makeTags(Model $model, array $eagerLoad = []): array;
 }

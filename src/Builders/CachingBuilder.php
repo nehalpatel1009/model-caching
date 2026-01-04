@@ -45,6 +45,14 @@ class CachingBuilder extends Builder
     }
 
     /**
+     * Alias for disableCache() for better API consistency.
+     */
+    public function withoutCache()
+    {
+        return $this->disableCache();
+    }
+
+    /**
      * Enable caching for this query.
      */
     public function enableCache()
@@ -63,8 +71,9 @@ class CachingBuilder extends Builder
             return parent::get($columns);
         }
 
-        $key = $this->generateCacheKey($columns);
-        $tags = $this->keyGenerator->makeTags($this->getModel());
+        $eagerLoad = $this->getEagerLoads();
+        $key = $this->generateCacheKey($columns, '', $eagerLoad);
+        $tags = $this->keyGenerator->makeTags($this->getModel(), $eagerLoad);
         $ttl = $this->getCacheTtl();
 
         $callback = function () use ($columns) {
@@ -83,8 +92,9 @@ class CachingBuilder extends Builder
             return parent::first($columns);
         }
 
-        $key = $this->generateCacheKey($columns, 'first');
-        $tags = $this->keyGenerator->makeTags($this->getModel());
+        $eagerLoad = $this->getEagerLoads();
+        $key = $this->generateCacheKey($columns, 'first', $eagerLoad);
+        $tags = $this->keyGenerator->makeTags($this->getModel(), $eagerLoad);
         $ttl = $this->getCacheTtl();
 
         $callback = function () use ($columns) {
@@ -103,8 +113,9 @@ class CachingBuilder extends Builder
             return parent::find($id, $columns);
         }
 
-        $key = $this->generateCacheKey($columns, "find:{$id}");
-        $tags = $this->keyGenerator->makeTags($this->getModel());
+        $eagerLoad = $this->getEagerLoads();
+        $key = $this->generateCacheKey($columns, "find:{$id}", $eagerLoad);
+        $tags = $this->keyGenerator->makeTags($this->getModel(), $eagerLoad);
         $ttl = $this->getCacheTtl();
 
         $callback = function () use ($id, $columns) {
@@ -123,8 +134,9 @@ class CachingBuilder extends Builder
             return parent::findMany($ids, $columns);
         }
 
-        $key = $this->generateCacheKey($columns, 'findMany:' . implode(',', (array) $ids));
-        $tags = $this->keyGenerator->makeTags($this->getModel());
+        $eagerLoad = $this->getEagerLoads();
+        $key = $this->generateCacheKey($columns, 'findMany:' . implode(',', (array) $ids), $eagerLoad);
+        $tags = $this->keyGenerator->makeTags($this->getModel(), $eagerLoad);
         $ttl = $this->getCacheTtl();
 
         $callback = function () use ($ids, $columns) {
@@ -146,8 +158,9 @@ class CachingBuilder extends Builder
         $page = $page ?: \Illuminate\Pagination\Paginator::resolveCurrentPage($pageName);
         $perPage = $perPage ?: $this->getModel()->getPerPage();
 
-        $key = $this->generateCacheKey($columns, "paginate:{$page}:{$perPage}");
-        $tags = $this->keyGenerator->makeTags($this->getModel());
+        $eagerLoad = $this->getEagerLoads();
+        $key = $this->generateCacheKey($columns, "paginate:{$page}:{$perPage}", $eagerLoad);
+        $tags = $this->keyGenerator->makeTags($this->getModel(), $eagerLoad);
         $ttl = $this->getCacheTtl();
 
         $callback = function () use ($perPage, $columns, $pageName, $page, $total) {
@@ -169,8 +182,9 @@ class CachingBuilder extends Builder
         $page = $page ?: \Illuminate\Pagination\Paginator::resolveCurrentPage($pageName);
         $perPage = $perPage ?: $this->getModel()->getPerPage();
 
-        $key = $this->generateCacheKey($columns, "simplePaginate:{$page}:{$perPage}");
-        $tags = $this->keyGenerator->makeTags($this->getModel());
+        $eagerLoad = $this->getEagerLoads();
+        $key = $this->generateCacheKey($columns, "simplePaginate:{$page}:{$perPage}", $eagerLoad);
+        $tags = $this->keyGenerator->makeTags($this->getModel(), $eagerLoad);
         $ttl = $this->getCacheTtl();
 
         $callback = function () use ($perPage, $columns, $pageName, $page) {
@@ -189,8 +203,9 @@ class CachingBuilder extends Builder
             return parent::count($columns);
         }
 
-        $key = $this->generateCacheKey(['*'], 'count');
-        $tags = $this->keyGenerator->makeTags($this->getModel());
+        $eagerLoad = $this->getEagerLoads();
+        $key = $this->generateCacheKey(['*'], 'count', $eagerLoad);
+        $tags = $this->keyGenerator->makeTags($this->getModel(), $eagerLoad);
         $ttl = $this->getCacheTtl();
 
         $callback = function () use ($columns) {
@@ -209,8 +224,9 @@ class CachingBuilder extends Builder
             return parent::exists();
         }
 
-        $key = $this->generateCacheKey(['*'], 'exists');
-        $tags = $this->keyGenerator->makeTags($this->getModel());
+        $eagerLoad = $this->getEagerLoads();
+        $key = $this->generateCacheKey(['*'], 'exists', $eagerLoad);
+        $tags = $this->keyGenerator->makeTags($this->getModel(), $eagerLoad);
         $ttl = $this->getCacheTtl();
 
         $callback = function () {
@@ -235,15 +251,28 @@ class CachingBuilder extends Builder
     /**
      * Generate cache key.
      */
-    protected function generateCacheKey($columns, $suffix = ''): string
+    protected function generateCacheKey($columns, $suffix = '', array $eagerLoad = []): string
     {
-        $baseKey = $this->keyGenerator->make($this->getModel(), $this->getQuery(), $columns);
+        $baseKey = $this->keyGenerator->make($this->getModel(), $this->getQuery(), $columns, $eagerLoad);
         
         if ($suffix) {
             return $baseKey . ':' . $suffix;
         }
 
         return $baseKey;
+    }
+
+    /**
+     * Get eager load relationships from the builder.
+     */
+    protected function getEagerLoads(): array
+    {
+        // Access the eagerLoad property from the parent Builder class
+        if (property_exists($this, 'eagerLoad') && is_array($this->eagerLoad)) {
+            return $this->eagerLoad;
+        }
+
+        return [];
     }
 
     /**
